@@ -26,11 +26,18 @@ async function run() {
     await client.connect();
     const db = client.db("IdeaVault");
     const ideasCollection = db.collection("Ideas");
+    const ideaCategoriesCollection = db.collection("ideaCategories");
     // ideas get api
     app.get("/ideas", async (req, res) => {
-      const result =await ideasCollection.find().toArray();
+      const result = await ideasCollection.find().toArray();
       res.send(result);
     });
+
+    // idea categories get api 
+    app.get('/idea-categories', async(req, res)=> {
+      const result = await ideaCategoriesCollection.find().toArray();
+      res.send(result);
+    })
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
