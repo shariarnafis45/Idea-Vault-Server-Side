@@ -33,11 +33,18 @@ async function run() {
       res.send(result);
     });
 
-    // idea categories get api 
-    app.get('/idea-categories', async(req, res)=> {
+    // idea categories get api
+    app.get("/idea-categories", async (req, res) => {
       const result = await ideaCategoriesCollection.find().toArray();
       res.send(result);
-    })
+    });
+
+    // add -idea api
+    app.post("/add-idea", async (req, res) => {
+      const newIdea =  req.body;
+      const result = await ideasCollection.insertOne(newIdea);
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
