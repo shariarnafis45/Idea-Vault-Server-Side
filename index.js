@@ -27,10 +27,29 @@ async function run() {
     const db = client.db("IdeaVault");
     const ideasCollection = db.collection("Ideas");
     const ideaCategoriesCollection = db.collection("ideaCategories");
-    // ideas get api
+    // ideas get api 
     app.get("/ideas", async (req, res) => {
-      const result = await ideasCollection.find().toArray();
-      res.send(result);
+      try {
+        const { search, category } = req.query;
+        const query = {};
+        // search
+        if (search) {
+          query.ideaTitle = {
+            $regex: search,
+            $options: "i",
+          };
+        }
+        // category
+        if (category) {
+          query.category = category;
+        }
+        const result = await ideasCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
     });
 
     // idea categories get api
@@ -41,7 +60,7 @@ async function run() {
 
     // add -idea api
     app.post("/add-idea", async (req, res) => {
-      const newIdea =  req.body;
+      const newIdea = req.body;
       const result = await ideasCollection.insertOne(newIdea);
       res.send(result);
     });
