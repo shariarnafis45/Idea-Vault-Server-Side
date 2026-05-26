@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = process.env.MONGO_URI;
 const port = process.env.PORT;
 
@@ -27,7 +27,7 @@ async function run() {
     const db = client.db("IdeaVault");
     const ideasCollection = db.collection("Ideas");
     const ideaCategoriesCollection = db.collection("ideaCategories");
-    // ideas get api 
+    // ideas get api
     app.get("/ideas", async (req, res) => {
       try {
         const { search, category } = req.query;
@@ -62,6 +62,26 @@ async function run() {
     app.post("/add-idea", async (req, res) => {
       const newIdea = req.body;
       const result = await ideasCollection.insertOne(newIdea);
+      res.send(result);
+    });
+
+    // my-ideas api
+    app.get("/my-ideas/:userId", async (req, res) => {
+      const { userId } = req.params;
+      const result = await ideasCollection.find({ userId: userId }).toArray();
+      res.send(result);
+    });
+
+    // idea update api
+    app.patch("/ideas/:id", async (req, res) => {
+      const { id } = req.params;
+      const updatedIdea = req.body;
+      const result = await ideasCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: updatedIdea,
+        },
+      );
       res.send(result);
     });
 
