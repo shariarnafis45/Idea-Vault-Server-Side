@@ -27,6 +27,7 @@ async function run() {
     const db = client.db("IdeaVault");
     const ideasCollection = db.collection("Ideas");
     const ideaCategoriesCollection = db.collection("ideaCategories");
+    const usersCollection = db.collection("user");
     // ideas get api
     app.get("/ideas", async (req, res) => {
       try {
@@ -89,6 +90,19 @@ async function run() {
     app.delete("/ideas/:id", async (req, res) => {
       const { id } = req.params;
       const result = await ideasCollection.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
+
+    // users update api
+    app.patch("/users/:userId", async (req, res) => {
+      const { userId } = req.params;
+      const updatedUser = req.body;
+      const result = await usersCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $set: updatedUser,
+        },
+      );
       res.send(result);
     });
 
