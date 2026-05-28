@@ -114,9 +114,19 @@ async function run() {
       res.send(result);
     });
 
-    // get all comments
-    app.get("/comments", async (req, res) => {
-      const result = await commentsCollection.find().toArray();
+    // get all comments of a idea
+    app.get("/comments/:ideaId", async (req, res) => {
+      const { ideaId } = req.params;
+      const result = await commentsCollection
+        .find({ ideaId: ideaId })
+        .toArray();
+      res.send(result);
+    });
+
+    // add comment post api
+    app.post("/comments", async (req, res) => {
+      const newComment = req.body;
+      const result = await commentsCollection.insertOne(newComment);
       res.send(result);
     });
 
