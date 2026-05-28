@@ -28,6 +28,7 @@ async function run() {
     const ideasCollection = db.collection("Ideas");
     const ideaCategoriesCollection = db.collection("ideaCategories");
     const usersCollection = db.collection("user");
+    const commentsCollection = db.collection("comments");
     // ideas get api
     app.get("/ideas", async (req, res) => {
       try {
@@ -110,6 +111,12 @@ async function run() {
           $set: updatedUser,
         },
       );
+      res.send(result);
+    });
+
+    // get all comments
+    app.get("/comments", async (req, res) => {
+      const result = await commentsCollection.find().toArray();
       res.send(result);
     });
 
