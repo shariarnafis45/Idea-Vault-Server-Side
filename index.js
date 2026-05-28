@@ -53,6 +53,13 @@ async function run() {
       }
     });
 
+    // single idea get api
+    app.get("/ideas/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await ideasCollection.findOne({ _id: id });
+      res.send(result);
+    });
+
     // idea categories get api
     app.get("/idea-categories", async (req, res) => {
       const result = await ideaCategoriesCollection.find().toArray();
