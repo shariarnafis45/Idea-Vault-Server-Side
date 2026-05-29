@@ -57,7 +57,7 @@ async function run() {
     // single idea get api
     app.get("/ideas/:id", async (req, res) => {
       const { id } = req.params;
-      const result = await ideasCollection.findOne({ _id: id });
+      const result = await ideasCollection.findOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
