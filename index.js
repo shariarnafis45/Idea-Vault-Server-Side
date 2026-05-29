@@ -123,6 +123,15 @@ async function run() {
       res.send(result);
     });
 
+    // delete a comment
+    app.delete("/comments/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await commentsCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      res.send(result);
+    });
+
     // add comment post api
     app.post("/comments", async (req, res) => {
       const newComment = req.body;
