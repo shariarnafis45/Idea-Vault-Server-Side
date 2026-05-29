@@ -132,6 +132,19 @@ async function run() {
       res.send(result);
     });
 
+    // update comment
+    app.patch("/comments/:id", async (req, res) => {
+      const { id } = req.params;
+      const updatedComment = req.body;
+      const result = await commentsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: updatedComment,
+        },
+      );
+      res.send(result);
+    });
+
     // add comment post api
     app.post("/comments", async (req, res) => {
       const newComment = req.body;
