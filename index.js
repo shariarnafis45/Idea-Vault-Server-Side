@@ -115,7 +115,7 @@ async function run() {
     });
 
     // get all comments of a idea
-    app.get("/comments/:ideaId", async (req, res) => {
+    app.get("/comments/idea/:ideaId", async (req, res) => {
       const { ideaId } = req.params;
       const result = await commentsCollection
         .find({ ideaId: ideaId })
@@ -149,6 +149,15 @@ async function run() {
     app.post("/comments", async (req, res) => {
       const newComment = req.body;
       const result = await commentsCollection.insertOne(newComment);
+      res.send(result);
+    });
+
+    // get all comments of a single user
+    app.get("/comments/user/:userId", async (req, res) => {
+      const { userId } = req.params;
+      const result = await commentsCollection
+        .find({ userId: userId })
+        .toArray();
       res.send(result);
     });
 
