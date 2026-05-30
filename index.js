@@ -97,8 +97,13 @@ async function run() {
     // idea delete
     app.delete("/ideas/:id", async (req, res) => {
       const { id } = req.params;
-      const result = await ideasCollection.deleteOne({ _id: new ObjectId(id) });
-      res.send(result);
+      const ideaDeleteResult = await ideasCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      const ideaCommentsDelete = await commentsCollection.deleteMany({
+        ideaId: id,
+      });
+      res.send({ideaDeleteResult, ideaCommentsDelete});
     });
 
     // users update api
