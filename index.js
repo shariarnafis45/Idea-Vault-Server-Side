@@ -37,11 +37,10 @@ const verifyToken = async (req, res, next) => {
   }
   try {
     const { payload } = await jwtVerify(token, JWKS);
+    next();
   } catch (error) {
     res.status(403).json({ message: "forbidden" });
   }
-
-  next();
 };
 
 async function run() {
@@ -84,7 +83,7 @@ async function run() {
       res.send(result);
     });
 
-    // idea categories get api
+    // ideas categories get api
     app.get("/idea-categories", async (req, res) => {
       const result = await ideaCategoriesCollection.find().toArray();
       res.send(result);
