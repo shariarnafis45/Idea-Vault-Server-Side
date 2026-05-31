@@ -142,7 +142,7 @@ async function run() {
     });
 
     // get all comments of a idea
-    app.get("/comments/idea/:ideaId", verifyToken, async (req, res) => {
+    app.get("/comments/idea/:ideaId",  async (req, res) => {
       const { ideaId } = req.params;
       const result = await commentsCollection
         .find({ ideaId: ideaId })
@@ -180,7 +180,7 @@ async function run() {
     });
 
     // get all comments of a single user
-    app.get("/comments/user/:userId", verifyToken, async (req, res) => {
+    app.get("/comments/user/:userId",  async (req, res) => {
       const { userId } = req.params;
       const result = await commentsCollection
         .find({ userId: userId })
