@@ -39,7 +39,7 @@ const verifyToken = async (req, res, next) => {
     const { payload } = await jwtVerify(token, JWKS);
     next();
   } catch (error) {
-    res.status(403).json({ message: "forbidden" });
+    return res.status(403).json({ message: "forbidden" });
   }
 };
 
