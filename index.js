@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 const uri = process.env.MONGO_URI;
 const port = process.env.PORT;
 
@@ -17,9 +18,29 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
 app.get("/", (req, res) => {
   res.send("Server Is Ok");
 });
+const JWKS = createRemoteJWKSet(new URL("http://localhost:3000/api/auth/jwks"));
+// verify token
+const verifyToken = async (req, res, next) => {
+  const headers = req?.headers.authorization;
+  if (!headers) {
+    res.status(401).json({ message: "unauthorized" });
+  }
+  const token = headers?.split(" ")[1];
+  if (!token) {
+    res.status(401).json({ message: "unauthorized" });
+  }
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+  } catch (error) {
+    res.status(403).json({ message: "forbidden" });
+  }
+
+  next();
+};
 
 async function run() {
   try {
@@ -55,7 +76,7 @@ async function run() {
     });
 
     // single idea get api
-    app.get("/ideas/:id", async (req, res) => {
+    app.get("/ideas/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
       const result = await ideasCollection.findOne({ _id: new ObjectId(id) });
       res.send(result);
@@ -75,7 +96,7 @@ async function run() {
     });
 
     // my-ideas api
-    app.get("/my-ideas/:userId", async (req, res) => {
+    app.get("/my-ideas/:userId",verifyToken, async (req, res) => {
       const { userId } = req.params;
       const result = await ideasCollection.find({ userId: userId }).toArray();
       res.send(result);
@@ -94,7 +115,7 @@ async function run() {
       res.send(result);
     });
 
-    // idea delete
+    // idea & ideas comment delete
     app.delete("/ideas/:id", async (req, res) => {
       const { id } = req.params;
       const ideaDeleteResult = await ideasCollection.deleteOne({
@@ -103,7 +124,7 @@ async function run() {
       const ideaCommentsDelete = await commentsCollection.deleteMany({
         ideaId: id,
       });
-      res.send({ideaDeleteResult, ideaCommentsDelete});
+      res.send({ ideaDeleteResult, ideaCommentsDelete });
     });
 
     // users update api
@@ -120,7 +141,7 @@ async function run() {
     });
 
     // get all comments of a idea
-    app.get("/comments/idea/:ideaId", async (req, res) => {
+    app.get("/comments/idea/:ideaId",verifyToken, async (req, res) => {
       const { ideaId } = req.params;
       const result = await commentsCollection
         .find({ ideaId: ideaId })
@@ -158,7 +179,7 @@ async function run() {
     });
 
     // get all comments of a single user
-    app.get("/comments/user/:userId", async (req, res) => {
+    app.get("/comments/user/:userId",verifyToken, async (req, res) => {
       const { userId } = req.params;
       const result = await commentsCollection
         .find({ userId: userId })
